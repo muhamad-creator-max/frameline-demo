@@ -1,0 +1,280 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   FRAMELINE — Visual Creative Alignment Platform
+   Design tokens · light / dark (soft glow) / RTL
+   Ported from the design package — palette + radii + shadows
+   live as direct CSS vars; the shadcn HSL vars are kept in sync
+   so existing primitives (Button, Input, Card…) inherit them.
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* ───── Frameline raw tokens ───── */
+    --bg:           #fefefe;
+    --bg-2:         #eff1f4;
+    --surface:      #ffffff;
+    --surface-2:    #f6f7f9;
+    --text:         #0a0a0b;
+    --text-2:       #5b6573;
+    --text-3:       #97a0ad;
+    --border-raw:   #e4e7ec;
+    --border-2:     #d6dae1;
+    --accent:       #00be43;
+    --accent-ink:   #019a37;
+    --accent-weak:  #e6f8ec;
+    --accent-contrast: #ffffff;
+    --danger:       #e5484d;
+    --shadow-sm:    0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.05);
+    --shadow-md:    0 4px 12px rgba(16,24,40,.08), 0 2px 4px rgba(16,24,40,.04);
+    --shadow-lg:    0 18px 48px rgba(16,24,40,.14), 0 4px 12px rgba(16,24,40,.06);
+    --glow:         none;
+    --ring-frame:   0 0 0 4px rgba(0,190,67,.16);
+
+    --r-sm: 8px;
+    --r-md: 12px;
+    --r-lg: 18px;
+    --r-xl: 26px;
+
+    --maxw: 1180px;
+    --sidebar-w: 252px;
+    --header-h: 60px;
+
+    /* ───── shadcn HSL vars routed to Frameline palette ───── */
+    --background: 0 0% 99.6%;
+    --foreground: 240 4% 5%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 4% 5%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 4% 5%;
+
+    --primary: 142 100% 37%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 19% 95%;
+    --secondary-foreground: 240 4% 5%;
+
+    --muted: 220 19% 95%;
+    --muted-foreground: 217 11% 40%;
+
+    --accent-h: 142 100% 37%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 358 75% 59%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 16% 91%;
+    --input: 220 13% 87%;
+    --ring: 142 100% 37%;
+
+    --brand-glow: 142 100% 50%;
+
+    --radius: 12px;
+  }
+
+  [data-theme="dark"],
+  .dark {
+    --bg:           #08090b;
+    --bg-2:         #0e1014;
+    --surface:      #14171c;
+    --surface-2:    #1a1e24;
+    --text:         #f3f6f9;
+    --text-2:       #9aa6b4;
+    --text-3:       #5f6a78;
+    --border-raw:   rgba(255,255,255,.08);
+    --border-2:     rgba(255,255,255,.14);
+    --accent:       #1aff6a;
+    --accent-ink:   #2bff7c;
+    --accent-weak:  rgba(26,255,106,.12);
+    --accent-contrast: #04130a;
+    --danger:       #ff6166;
+    --shadow-sm:    0 1px 2px rgba(0,0,0,.5);
+    --shadow-md:    0 6px 18px rgba(0,0,0,.5);
+    --shadow-lg:    0 24px 60px rgba(0,0,0,.6);
+    --glow:         0 0 0 1px rgba(26,255,106,.25), 0 0 26px rgba(26,255,106,.30);
+    --ring-frame:   0 0 0 4px rgba(26,255,106,.22);
+
+    --background: 220 11% 4%;
+    --foreground: 210 25% 96%;
+
+    --card: 220 13% 9%;
+    --card-foreground: 210 25% 96%;
+
+    --popover: 220 13% 9%;
+    --popover-foreground: 210 25% 96%;
+
+    --primary: 138 100% 55%;
+    --primary-foreground: 138 60% 5%;
+
+    --secondary: 220 13% 12%;
+    --secondary-foreground: 210 25% 96%;
+
+    --muted: 220 13% 11%;
+    --muted-foreground: 213 13% 65%;
+
+    --accent-foreground: 138 60% 5%;
+
+    --destructive: 358 100% 70%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 7% 14%;
+    --input: 220 7% 14%;
+    --ring: 138 100% 55%;
+
+    --brand-glow: 138 100% 65%;
+  }
+}
+
+@layer base {
+  * { box-sizing: border-box; border-color: hsl(var(--border)); }
+
+  html, body { height: 100%; }
+
+  /* Pro/minimal scale: 13.5px root keeps layouts tight without feeling cramped. */
+  html { font-size: 13.5px; }
+  @media (min-width: 1536px) { html { font-size: 14px; } }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-rubik), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    letter-spacing: -0.005em;
+  }
+
+  ::selection { background: var(--accent); color: var(--accent-contrast); }
+
+  /* instant theme switch — suppress transitions during the swap so
+     backgrounds don't animate (also avoids stuck states if throttled) */
+  .theme-switching * { transition: none !important; }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 99px; border: 3px solid var(--bg); background-clip: padding-box; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-3); background-clip: padding-box; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* RTL helpers — Arabic */
+  [dir="rtl"] .ltr-only { display: none; }
+  [dir="ltr"] .rtl-only { display: none; }
+
+  h1,h2,h3,h4 { margin: 0; letter-spacing: -0.02em; font-weight: 600; }
+}
+
+@layer components {
+  /* ── Frameline eyebrow label (uppercase, tracked, Rubik 500) ── */
+  .eyebrow {
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    font-weight: 500;
+  }
+  .mono { font-family: var(--font-jetbrains-mono), ui-monospace, monospace; }
+  .muted { color: var(--text-2); }
+  .faint { color: var(--text-3); }
+
+  /* ── Frame-mark logo glow surface, used in dark mode for hero cards ── */
+  .glow-surface {
+    @apply relative bg-card;
+    box-shadow: 0 0 0 1px hsl(var(--border)), 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  }
+  .dark .glow-surface {
+    box-shadow: 0 0 0 1px hsl(var(--border)), 0 0 60px -20px hsl(var(--brand-glow) / 0.25);
+  }
+
+  /* ── AI-prompt-style composer used on the client flow ── */
+  .prompt-shell {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-2);
+    border-radius: 22px;
+    box-shadow: var(--shadow-md);
+    transition: box-shadow .2s ease;
+  }
+  .dark .prompt-shell {
+    background: var(--surface);
+    box-shadow:
+      0 0 0 1px var(--border-2),
+      0 0 40px -8px rgba(26,255,106,.25),
+      0 18px 60px -20px rgba(0,0,0,.6);
+  }
+
+  /* ── Media placeholder used by builder + dashboard small previews ── */
+  .media-ph {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    background:
+      repeating-linear-gradient(135deg, var(--surface-2) 0 11px, transparent 11px 22px),
+      var(--bg-2);
+    color: var(--text-3);
+    overflow: hidden;
+    border-radius: inherit;
+  }
+  [data-theme="dark"] .media-ph,
+  .dark .media-ph {
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,.03) 0 11px, transparent 11px 22px),
+      var(--surface-2);
+  }
+  .ph-tag {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 99px;
+    background: var(--surface);
+    border: 1px solid var(--border-raw);
+    color: var(--text-2);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+
+  /* ── Subtle grid background for landing / empty states ── */
+  .bg-grid {
+    background-image:
+      linear-gradient(hsl(var(--border) / 0.6) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.6) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
+  }
+
+  /* ── Low-opacity dotted background for the brief (light mode only) ── */
+  .brief-dotted-bg {
+    background-image: radial-gradient(rgba(16, 24, 40, 0.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+    background-position: -11px -11px;
+  }
+  [data-theme="dark"] .brief-dotted-bg,
+  .dark .brief-dotted-bg {
+    background-image: none;
+  }
+
+  /* ── Fade transitions matching the design package ── */
+  .fade-enter { animation: fadeUp .5s cubic-bezier(.22,.61,.36,1) both; }
+  .fade-only  { animation: fadeIn .5s ease both; }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .text-pretty  { text-wrap: pretty; }
+
+  .focus-ring {
+    @apply outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-ring;
+  }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

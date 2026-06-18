@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(grep -q \"Ready in\\\\|started server\\\\|Local:\" /tmp/devlog.txt)",
+      "Bash(break)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/r/nonexistentslug)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/app/review)",
+      "Bash(curl -s -X POST http://localhost:3000/api/review/r/badslug/unlock -H \"content-type: application/json\" -d '{}' -w \"\\\\n[status %{http_code}]\\\\n\")",
+      "Bash(curl -s -X POST http://localhost:3000/api/review/projects -H \"content-type: application/json\" -d '{}' -w \"\\\\n[status %{http_code}]\\\\n\")",
+      "Bash(npx next *)",
+      "Bash(echo \"=== EXIT: $? \\(no output above = clean\\) ===\")"
+    ]
+  }
+}
