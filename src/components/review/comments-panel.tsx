@@ -34,6 +34,7 @@ export function CommentsPanel({
   callbacks,
   versionPicker,
   canAnnotate,
+  fullHeight,
 }: {
   versionId: string;
   onSeek: (t: number) => void;
@@ -42,6 +43,8 @@ export function CommentsPanel({
   versionPicker?: React.ReactNode;
   /** Whether the Annotate toggle should appear in the composer (video, not comparing). */
   canAnnotate?: boolean;
+  /** Mobile sheet mode: fill the container width instead of the fixed side-panel width. */
+  fullHeight?: boolean;
 }) {
   const comments = useReviewStore((s) => s.comments);
   const activeCommentId = useReviewStore((s) => s.activeCommentId);
@@ -52,11 +55,11 @@ export function CommentsPanel({
   return (
     <div
       style={{
-        width: 384,
+        width: fullHeight ? "100%" : 384,
         flexShrink: 0,
         display: "flex",
         flexDirection: "column",
-        borderInlineStart: "1px solid var(--border-raw)",
+        borderInlineStart: fullHeight ? "none" : "1px solid var(--border-raw)",
         background: "var(--bg-2)",
         height: "100%",
       }}

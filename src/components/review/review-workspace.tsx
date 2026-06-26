@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import { toast } from "sonner";
-import { Download, Share2, Columns2 } from "lucide-react";
+import { Download, Share2, Columns2, MessageSquare, X } from "lucide-react";
 import { useReviewStore } from "@/lib/review/store";
+import { useIsMobile } from "@/lib/hooks/use-media-query";
 import { versionSrcClient } from "@/lib/review/client";
 import type { AssetDTO, CommentDTO, CreateCommentInput } from "@/lib/review/types";
 import type { AnnotationCoordinates, CommentStatus } from "@/lib/supabase/database.types";
@@ -65,6 +66,12 @@ export function ReviewWorkspace({
 
   const [guestToken, setGuestToken] = React.useState<string | null>(null);
   const stageRef = React.useRef<VideoStageHandle>(null);
+
+  // On phones the comments panel can't sit beside the video — stack the video
+  // full-width and open comments as a slide-up sheet via a toggle.
+  const isMobile = useIsMobile();
+  const [commentsOpen, setCommentsOpen] = React.useState(false);
+  const totalComments = React.useMemo(() => countAllComments(comments), [comments]);
 
   // ── compare mode ──
   // The PRIMARY player is always the active `version` (also the comments source).
@@ -208,8 +215,8 @@ export function ReviewWorkspace({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 12,
-          padding: "12px 16px",
+          gap: isMobile ? 8 : 12,
+          padding: isMobile ? "10px 12px" : "12px 16px",
           borderBottom: "1px solid var(--border-raw)",
           background: "var(--bg)",
         }}
@@ -236,7 +243,7 @@ export function ReviewWorkspace({
             }}
             title="Compare versions"
           >
-            <Columns2 size={15} /> Compare
+            <Columns2 size={15} /> {!isMobile && "Compare"}
           </button>
         )}
         <VersionSwitcher versions={asset.versions} activeId={version.id} onSelect={setVersionId} />
@@ -256,9 +263,11 @@ export function ReviewWorkspace({
         )}
       </header>
 
-      {/* body: the SAME stage (with an optional compare mirror) + comments */}
-      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-        <div style={{ flex: 1, minWidth: 0, padding: 16, overflowY: "auto" }}>
+      {/* body: the SAME stage (with an optional compare mirror) + comments.
+          Desktop = side-by-side row; mobile = video full-width with comments in
+          a slide-up sheet (toggled by the floating button below). */}
+      <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", flex: 1, minHeight: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, padding: isMobile ? 12 : 16, overflowY: "auto" }}>
           <VideoStage
             ref={stageRef}
             kind={asset.kind}
@@ -290,33 +299,119 @@ export function ReviewWorkspace({
           />
         </div>
 
-        <CommentsPanel
-          versionId={version.id}
-          canAnnotate={asset.kind === "video" && !comparing}
-          versionPicker={
-            comparing ? (
-              <VersionSwitcher versions={asset.versions} activeId={version.id} onSelect={setVersionId} />
-            ) : undefined
+        {/* Mobile: dim backdrop behind the sheet. */}
+        {isMobile && commentsOpen && (
+          <div
+            onClick={() => setCommentsOpen(false)}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", zIndex: 40 }}
+          />
+        )}
+
+        {/* Comments: inline side panel on desktop, slide-up sheet on mobile. */}
+        <div
+          style={
+            isMobile
+              ? {
+                  position: "fixed",
+                  insetInline: 0,
+                  insetBlockEnd: 0,
+                  height: "min(72vh, 560px)",
+                  zIndex: 41,
+                  borderStartStartRadius: "var(--r-lg)",
+                  borderStartEndRadius: "var(--r-lg)",
+                  overflow: "hidden",
+                  boxShadow: "var(--shadow-lg)",
+                  transform: commentsOpen ? "translateY(0)" : "translateY(110%)",
+                  transition: "transform .25s cubic-bezier(.22,.61,.36,1)",
+                  display: "flex",
+                  flexDirection: "column",
+                }
+              : undefined
           }
-          onSeek={(t) => {
-            // Pause so the viewer lands on the exact frame — required for the
-            // comment's (single-frame) annotation to actually be visible.
-            stageRef.current?.pause();
-            stageRef.current?.seekTo(t);
-          }}
-          callbacks={{
-            onCreate: handleCreate,
-            onReply: handleCreate,
-            onSetStatus: api.setStatus ? handleSetStatus : undefined,
-            onDelete: api.deleteComment ? handleDelete : undefined,
-            onEdit: api.editComment ? handleEdit : undefined,
-            canManageStatus: mode === "owner",
-            guestToken,
-          }}
-        />
+        >
+          {isMobile && (
+            <button
+              type="button"
+              onClick={() => setCommentsOpen(false)}
+              style={{
+                position: "absolute",
+                insetBlockStart: 10,
+                insetInlineEnd: 10,
+                zIndex: 1,
+                ...iconBtn,
+                width: 30,
+                height: 30,
+              }}
+              aria-label="Close comments"
+            >
+              <X size={15} />
+            </button>
+          )}
+          <CommentsPanel
+            versionId={version.id}
+            canAnnotate={asset.kind === "video" && !comparing}
+            fullHeight={isMobile}
+            versionPicker={
+              comparing ? (
+                <VersionSwitcher versions={asset.versions} activeId={version.id} onSelect={setVersionId} />
+              ) : undefined
+            }
+            onSeek={(t) => {
+              // Pause so the viewer lands on the exact frame — required for the
+              // comment's (single-frame) annotation to actually be visible.
+              stageRef.current?.pause();
+              stageRef.current?.seekTo(t);
+              if (isMobile) setCommentsOpen(false); // reveal the frame on phones
+            }}
+            callbacks={{
+              onCreate: handleCreate,
+              onReply: handleCreate,
+              onSetStatus: api.setStatus ? handleSetStatus : undefined,
+              onDelete: api.deleteComment ? handleDelete : undefined,
+              onEdit: api.editComment ? handleEdit : undefined,
+              canManageStatus: mode === "owner",
+              guestToken,
+            }}
+          />
+        </div>
       </div>
+
+      {/* Mobile: floating button to open the comments sheet. */}
+      {isMobile && !commentsOpen && (
+        <button
+          type="button"
+          onClick={() => setCommentsOpen(true)}
+          style={{
+            position: "fixed",
+            insetBlockEnd: 18,
+            insetInlineEnd: 18,
+            zIndex: 39,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            height: 46,
+            padding: "0 18px",
+            borderRadius: 999,
+            border: "none",
+            background: "var(--accent)",
+            color: "var(--accent-contrast)",
+            fontSize: 14,
+            fontWeight: 600,
+            boxShadow: "var(--shadow-lg)",
+            cursor: "pointer",
+          }}
+        >
+          <MessageSquare size={17} />
+          Comments
+          {totalComments > 0 && <span style={{ opacity: 0.85 }}>{totalComments}</span>}
+        </button>
+      )}
     </div>
   );
+}
+
+function countAllComments(comments: CommentDTO[]): number {
+  return comments.reduce((n, c) => n + 1 + countAllComments(c.replies), 0);
 }
 
 function flattenAnnotations(comments: CommentDTO[]): CommentDTO["annotations"] {

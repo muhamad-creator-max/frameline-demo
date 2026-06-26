@@ -4,6 +4,7 @@ import * as React from "react";
 import dynamic from "next/dynamic";
 import { Pencil, Pause, Play, Music } from "lucide-react";
 import { useReviewStore } from "@/lib/review/store";
+import { useIsMobile } from "@/lib/hooks/use-media-query";
 import { statusOption } from "@/lib/review/status";
 import { formatTimecodeFrames, DEFAULT_FPS } from "@/lib/review/coords";
 import type { AnnotationCoordinates } from "@/lib/supabase/database.types";
@@ -87,6 +88,7 @@ export const VideoStage = React.forwardRef<
   const playerRef = React.useRef<ReviewPlayerHandle | null>(null);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const boxRef = React.useRef<HTMLDivElement | null>(null);
+  const isMobile = useIsMobile();
 
   const [box, setBox] = React.useState<Box>({ width: 0, height: 0 });
   const [pstate, setPstate] = React.useState<PlayerState>(EMPTY_PLAYER_STATE);
@@ -378,7 +380,8 @@ export const VideoStage = React.forwardRef<
               : (version.aspectRatio?.replace(":", " / ") ?? "16 / 9"),
           maxHeight: "72vh",
           display: comparing ? "flex" : undefined,
-          height: comparing ? "56vh" : undefined,
+          flexDirection: comparing && isMobile ? "column" : undefined,
+          height: comparing ? (isMobile ? "64vh" : "56vh") : undefined,
           gap: comparing ? 2 : undefined,
         }}
       >

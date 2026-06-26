@@ -12,7 +12,13 @@ export const newShareSlug = customAlphabet(slugAlphabet, 12);
 export const newId = customAlphabet(slugAlphabet, 18);
 
 export function absoluteUrl(path: string) {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const base =
+    process.env.NEXT_PUBLIC_APP_URL ??
+    // In the browser, derive from the actual origin (works on any deployment).
+    (typeof window !== "undefined" ? window.location.origin : undefined) ??
+    // On the server (Vercel) fall back to the deployment URL.
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ??
+    "http://localhost:3000";
   return `${base.replace(/\/$/, "")}/${path.replace(/^\//, "")}`;
 }
 
