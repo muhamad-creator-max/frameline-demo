@@ -6,10 +6,12 @@ import { Toaster } from "@/components/ui/sonner";
 import { I18nProvider, type Locale } from "@/lib/i18n/provider";
 import "./globals.css";
 
-const rubik = Rubik({
+// Frameline body/UI face. Rubik ships an Arabic subset, so RTL text renders
+// in-face rather than falling back to a system font.
+const sans = Rubik({
   subsets: ["latin", "arabic"],
-  variable: "--font-rubik",
-  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -49,7 +51,7 @@ export default async function RootLayout({
       lang={locale}
       dir={dir}
       suppressHydrationWarning
-      className={`${rubik.variable} ${jetbrainsMono.variable}`}
+      className={`${sans.variable} ${jetbrainsMono.variable}`}
     >
       <body className="min-h-screen bg-background font-sans text-foreground">
         <ThemeProvider

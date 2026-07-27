@@ -7,7 +7,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: profile }, { data: recentGuidelines }, { data: recentResponses }, { data: recentReviews }] =
+  const [{ data: profile }, { data: recentGuidelines }, { data: recentResponses }, { data: recentReviews }, { data: recentWorkflows }] =
     await Promise.all([
       supabase
         .from("profiles")
@@ -35,6 +35,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         .is("deleted_at", null)
         .order("updated_at", { ascending: false })
         .limit(10),
+      supabase
+        .from("workflow_projects")
+        .select("id, title")
+        .eq("owner_id", user.id)
+        .is("deleted_at", null)
+        .order("updated_at", { ascending: false })
+        .limit(10),
     ]);
 
   // Filter responses to ones the user owns (RLS handles security, but the join
@@ -58,6 +65,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       recentGuidelines={(recentGuidelines ?? []).map((g) => ({ id: g.id, title: g.title }))}
       recentResponses={ownedResponses}
       recentReviews={(recentReviews ?? []).map((p) => ({ id: p.id, title: p.name }))}
+      recentWorkflows={(recentWorkflows ?? []).map((w) => ({ id: w.id, title: w.title }))}
     >
       {children}
     </AppShell>

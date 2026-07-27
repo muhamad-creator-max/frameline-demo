@@ -97,41 +97,23 @@ function Stat({
   icon, label, value,
 }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
   return (
-    <div
-      style={{
-        background: "var(--surface)",
-        border: "1px solid var(--border-raw)",
-        borderRadius: "var(--r-md)",
-        padding: "14px 16px",
-        display: "flex", flexDirection: "column", gap: 6,
-      }}
-    >
-      <span style={{ display: "inline-flex", alignItems: "center", gap: 7, color: "var(--text-2)", fontSize: 12 }}>
+    <div className="cv-card" style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 6 }}>
+      <span className="cv-meta" style={{ display: "inline-flex", alignItems: "center", gap: 7, color: "var(--text-3)", fontSize: 9.5 }}>
         {icon} {label}
       </span>
-      <span style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.02em" }}>{value}</span>
+      <span className="display-title" style={{ ["--display-title-size" as string]: "22px" }}>{value}</span>
     </div>
   );
 }
 
 function Card({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        background: "var(--surface)",
-        border: "1px solid var(--border-raw)",
-        borderRadius: "var(--r-md)",
-      }}
-    >
-      {children}
-    </div>
-  );
+  return <div className="cv-card">{children}</div>;
 }
 
 function SectionHeader({ title, children }: { title: string; children?: React.ReactNode }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-      <h2 style={{ fontSize: 13, fontWeight: 600, color: "var(--text-2)", textTransform: "uppercase", letterSpacing: ".06em" }}>
+      <h2 className="display-title" style={{ ["--display-title-size" as string]: "11px", color: "var(--text-3)" }}>
         {title}
       </h2>
       {children}
@@ -143,7 +125,7 @@ function PageShell({ title, children }: { title: string; children: React.ReactNo
   return (
     <div style={{ height: "100%", overflowY: "auto" }}>
       <div style={{ maxWidth: 980, margin: "0 auto", padding: "28px 32px 80px" }}>
-        <h1 style={{ fontSize: 22, fontWeight: 600, marginBottom: 22 }}>{title}</h1>
+        <h1 className="display-title" style={{ ["--display-title-size" as string]: "22px", marginBottom: 22 }}>{title}</h1>
         {children}
       </div>
     </div>

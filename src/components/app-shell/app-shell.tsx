@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Home, FileText, Inbox, Trash2, Settings, Sparkles,
-  ChevronDown, UserPlus, LogOut, RefreshCw, ChevronRight, Clapperboard,
+  ChevronDown, UserPlus, LogOut, RefreshCw, ChevronRight, ChevronLeft, Clapperboard,
+  Workflow as WorkflowIcon,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/provider";
@@ -21,27 +22,53 @@ interface ShellProfile {
 interface RecentItem { id: string; title: string }
 interface RecentResponse { id: string; client_name: string; guideline_title: string }
 
+/** localStorage key for the sidebar's collapsed preference. */
+const SIDEBAR_KEY = "frameline:sidebar-collapsed";
+const SIDEBAR_W = 248;
+const SIDEBAR_W_COLLAPSED = 68;
+
 export function AppShell({
   profile,
   recentGuidelines,
   recentResponses,
   recentReviews = [],
+  recentWorkflows = [],
   children,
 }: {
   profile: ShellProfile;
   recentGuidelines: RecentItem[];
   recentResponses: RecentResponse[];
   recentReviews?: RecentItem[];
+  recentWorkflows?: RecentItem[];
   children: React.ReactNode;
 }) {
   const { dir } = useI18n();
   const [aiOpen, setAiOpen] = React.useState(false);
+  // Sidebar collapse. Starts expanded so server and first client render agree;
+  // the stored preference is applied after mount to avoid a hydration mismatch.
+  const [collapsed, setCollapsed] = React.useState(false);
+
+  React.useEffect(() => {
+    if (localStorage.getItem(SIDEBAR_KEY) === "1") setCollapsed(true);
+  }, []);
+
+  function toggleCollapsed() {
+    setCollapsed((v) => {
+      localStorage.setItem(SIDEBAR_KEY, v ? "0" : "1");
+      return !v;
+    });
+  }
 
   React.useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setAiOpen((v) => !v);
+      }
+      // ⌘/Ctrl + B toggles the sidebar (common editor shortcut).
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "b") {
+        e.preventDefault();
+        toggleCollapsed();
       }
     }
     window.addEventListener("keydown", onKey);
@@ -63,7 +90,11 @@ export function AppShell({
         recentGuidelines={recentGuidelines}
         recentResponses={recentResponses}
         recentReviews={recentReviews}
+        recentWorkflows={recentWorkflows}
         onOpenAi={() => setAiOpen(true)}
+        collapsed={collapsed}
+        onToggleCollapsed={toggleCollapsed}
+        dir={dir}
       />
       <main style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
         {children}
@@ -79,13 +110,21 @@ function Sidebar({
   recentGuidelines,
   recentResponses,
   recentReviews,
+  recentWorkflows,
   onOpenAi,
+  collapsed,
+  onToggleCollapsed,
+  dir,
 }: {
   profile: ShellProfile;
   recentGuidelines: RecentItem[];
   recentResponses: RecentResponse[];
   recentReviews: RecentItem[];
+  recentWorkflows: RecentItem[];
   onOpenAi: () => void;
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
+  dir: string;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -95,6 +134,7 @@ function Sidebar({
   const [recentGOpen, setRecentGOpen] = React.useState(true);
   const [recentROpen, setRecentROpen] = React.useState(false);
   const [recentVOpen, setRecentVOpen] = React.useState(false);
+  const [recentWOpen, setRecentWOpen] = React.useState(false);
 
   const workspaceName = `${profile.name.split(" ")[0] || "Your"}'s ${
     profile.plan === "studio" ? "Studio" : "Workspace"
@@ -109,7 +149,7 @@ function Sidebar({
   return (
     <aside
       style={{
-        width: 248,
+        width: collapsed ? SIDEBAR_W_COLLAPSED : SIDEBAR_W,
         flexShrink: 0,
         background: "var(--bg-2)",
         borderInlineEnd: "1px solid var(--border-raw)",
@@ -118,14 +158,67 @@ function Sidebar({
         padding: "10px 6px 6px",
         gap: 2,
         position: "relative",
+        transition: "width .18s cubic-bezier(.4,0,.2,1)",
+        // NOTE: deliberately no overflow clipping here — the account dropdown is
+        // a child popover wider than the rail and would get cut off. Nothing in
+        // the rail protrudes past its edge, so the page area stays clear.
+        minWidth: 0,
       }}
     >
+      {/* Collapse / expand toggle. Kept INSIDE the sidebar's own box (its own
+          row, not an overhanging pin) — the Workflows canvas butts its tool rail
+          right against the sidebar, so anything protruding covers it and steals
+          clicks. */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: collapsed ? "center" : "flex-end",
+          paddingInline: 2,
+          marginBottom: 2,
+        }}
+      >
+        <button
+          onClick={onToggleCollapsed}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+          title={`${collapsed ? "Expand" : "Collapse"} sidebar (Ctrl/⌘ B)`}
+          style={{
+            width: 24,
+            height: 24,
+            borderRadius: "50%",
+            display: "grid",
+            placeItems: "center",
+            background: "transparent",
+            border: "1px solid transparent",
+            color: "var(--text-3)",
+            cursor: "pointer",
+            padding: 0,
+            transition: "background .12s ease, color .12s ease, border-color .12s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--surface)";
+            e.currentTarget.style.borderColor = "var(--border-raw)";
+            e.currentTarget.style.color = "var(--text)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.borderColor = "transparent";
+            e.currentTarget.style.color = "var(--text-3)";
+          }}
+        >
+          {/* Chevron always aims the way the sidebar will move (RTL-mirrored). */}
+          {collapsed === (dir === "rtl") ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+        </button>
+      </div>
+
       <div style={{ position: "relative" }}>
         <button
           onClick={() => setAccountOpen((v) => !v)}
+          title={collapsed ? workspaceName : undefined}
           style={{
             display: "flex", alignItems: "center", gap: 8,
             width: "100%", padding: "6px 8px",
+            justifyContent: collapsed ? "center" : undefined,
             borderRadius: 6,
             background: accountOpen ? "var(--surface)" : "transparent",
             color: "var(--text)",
@@ -146,16 +239,20 @@ function Sidebar({
           >
             {(profile.name[0] ?? "F").toUpperCase()}
           </span>
-          <span
-            style={{
-              fontSize: 13.5, fontWeight: 500,
-              flex: 1, textAlign: "start", minWidth: 0,
-              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-            }}
-          >
-            {workspaceName}
-          </span>
-          <ChevronDown size={14} style={{ color: "var(--text-3)" }} />
+          {!collapsed && (
+            <>
+              <span
+                style={{
+                  fontSize: 13.5, fontWeight: 500,
+                  flex: 1, textAlign: "start", minWidth: 0,
+                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                }}
+              >
+                {workspaceName}
+              </span>
+              <ChevronDown size={14} style={{ color: "var(--text-3)" }} />
+            </>
+          )}
         </button>
 
         {accountOpen && (
@@ -170,13 +267,17 @@ function Sidebar({
 
       <div style={{ height: 10 }} />
 
-      <NavLink href="/app" icon={Home} active={pathname === "/app"}>Dashboard</NavLink>
-      <NavLink href="/app/guidelines" icon={FileText} active={pathname === "/app/guidelines" || pathname.startsWith("/app/guidelines/")}>Guidelines</NavLink>
-      <NavLink href="/app/responses" icon={Inbox} active={pathname.startsWith("/app/responses")}>Responses</NavLink>
-      <NavLink href="/app/review" icon={Clapperboard} active={pathname.startsWith("/app/review")}>Review</NavLink>
+      <NavLink href="/app" icon={Home} active={pathname === "/app"} collapsed={collapsed}>Dashboard</NavLink>
+      <NavLink href="/app/guidelines" icon={FileText} active={pathname === "/app/guidelines" || pathname.startsWith("/app/guidelines/")} collapsed={collapsed}>Guidelines</NavLink>
+      <NavLink href="/app/workflows" icon={WorkflowIcon} active={pathname === "/app/workflows" || pathname.startsWith("/app/workflows/")} collapsed={collapsed}>Workflows</NavLink>
+      <NavLink href="/app/responses" icon={Inbox} active={pathname.startsWith("/app/responses")} collapsed={collapsed}>Responses</NavLink>
+      <NavLink href="/app/review" icon={Clapperboard} active={pathname.startsWith("/app/review")} collapsed={collapsed}>Review</NavLink>
 
       <div style={{ height: 12 }} />
 
+      {/* Recent lists are text-only, so they're hidden while collapsed. */}
+      {!collapsed && (
+      <>
       <Section label="Recent guidelines" open={recentGOpen} onToggle={() => setRecentGOpen((v) => !v)}>
         {recentGuidelines.length === 0 ? (
           <Empty>No briefs yet</Empty>
@@ -189,6 +290,23 @@ function Sidebar({
               icon={<FileText size={12} style={{ color: "var(--text-3)" }} />}
             >
               {g.title || "Untitled"}
+            </SubLink>
+          ))
+        )}
+      </Section>
+
+      <Section label="Recent workflows" open={recentWOpen} onToggle={() => setRecentWOpen((v) => !v)}>
+        {recentWorkflows.length === 0 ? (
+          <Empty>No workflows yet</Empty>
+        ) : (
+          recentWorkflows.slice(0, 10).map((w) => (
+            <SubLink
+              key={w.id}
+              href={`/app/workflows/${w.id}`}
+              active={pathname.includes(w.id)}
+              icon={<WorkflowIcon size={12} style={{ color: "var(--text-3)" }} />}
+            >
+              {w.title || "Untitled"}
             </SubLink>
           ))
         )}
@@ -227,39 +345,45 @@ function Sidebar({
           ))
         )}
       </Section>
+      </>
+      )}
 
       <div style={{ flex: 1 }} />
 
-      <NavLink href="/app/trash" icon={Trash2} active={pathname.startsWith("/app/trash")}>Trash</NavLink>
-      <NavLink href="/app/settings" icon={Settings} active={pathname.startsWith("/app/settings")}>Settings</NavLink>
+      <NavLink href="/app/trash" icon={Trash2} active={pathname.startsWith("/app/trash")} collapsed={collapsed}>Trash</NavLink>
+      <NavLink href="/app/settings" icon={Settings} active={pathname.startsWith("/app/settings")} collapsed={collapsed}>Settings</NavLink>
 
       <div style={{ height: 6 }} />
 
       <button
         onClick={onOpenAi}
+        title={collapsed ? "AI Assistant (⌘K)" : undefined}
         style={{
           display: "flex", alignItems: "center", gap: 9,
-          padding: "9px 12px",
+          padding: collapsed ? "9px 0" : "9px 12px",
+          justifyContent: collapsed ? "center" : undefined,
           margin: "0 2px 4px",
-          borderRadius: 8,
+          borderRadius: "var(--r-md)",
           background: "var(--accent)",
           color: "var(--accent-contrast)",
-          boxShadow: "var(--glow)",
-          fontWeight: 500, fontSize: 13,
           border: "1px solid transparent", cursor: "pointer",
           transition: "filter .12s ease",
         }}
-        onMouseEnter={(e) => { e.currentTarget.style.filter = "brightness(1.05)"; }}
+        onMouseEnter={(e) => { e.currentTarget.style.filter = "brightness(1.15)"; }}
         onMouseLeave={(e) => { e.currentTarget.style.filter = ""; }}
       >
         <Sparkles size={14} />
-        <span style={{ flex: 1, textAlign: "start" }}>AI Assistant</span>
-        <span
-          className="mono"
-          style={{ fontSize: 10, opacity: 0.85, padding: "2px 6px", borderRadius: 4, background: "rgba(0,0,0,0.15)" }}
-        >
-          ⌘K
-        </span>
+        {!collapsed && (
+          <>
+            <span className="cv-meta" style={{ flex: 1, textAlign: "start", fontSize: 11 }}>AI Assistant</span>
+            <span
+              className="mono"
+              style={{ fontSize: 10, opacity: 0.85, padding: "2px 6px", borderRadius: 4, background: "rgba(0,0,0,0.15)" }}
+            >
+              ⌘K
+            </span>
+          </>
+        )}
       </button>
     </aside>
   );
@@ -269,19 +393,25 @@ function NavLink({
   href,
   icon: Icon,
   active,
+  collapsed,
   children,
 }: {
   href: string;
   icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>;
   active: boolean;
+  collapsed?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <Link
       href={href}
+      // Collapsed rail shows icons only; the native tooltip names the item.
+      title={collapsed ? String(children) : undefined}
+      aria-label={collapsed ? String(children) : undefined}
       style={{
         display: "flex", alignItems: "center", gap: 9,
         padding: "5px 8px",
+        justifyContent: collapsed ? "center" : undefined,
         borderRadius: 5,
         fontSize: 13.5, fontWeight: 500,
         background: active ? "var(--surface)" : "transparent",
@@ -289,12 +419,13 @@ function NavLink({
         textDecoration: "none",
         boxShadow: active ? "var(--shadow-sm)" : "none",
         transition: "background .12s ease",
+        whiteSpace: "nowrap", overflow: "hidden",
       }}
       onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = "rgba(0,0,0,.04)"; }}
       onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = "transparent"; }}
     >
       <Icon size={15} style={{ color: active ? "var(--accent)" : "var(--text-3)" }} />
-      {children}
+      {!collapsed && children}
     </Link>
   );
 }
@@ -348,13 +479,13 @@ function Section({
     <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
       <button
         onClick={onToggle}
+        className="cv-meta"
         style={{
           display: "flex", alignItems: "center", gap: 4,
           padding: "5px 8px",
           borderRadius: 5,
-          fontSize: 11, fontWeight: 500,
+          fontSize: 9.5,
           color: "var(--text-3)",
-          textTransform: "uppercase", letterSpacing: ".08em",
           background: "transparent", border: "none", cursor: "pointer",
           width: "100%", textAlign: "start",
         }}

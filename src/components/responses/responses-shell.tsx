@@ -136,7 +136,7 @@ export function ResponsesShell({
                   <span
                     style={{
                       width: 7, height: 7, borderRadius: 99,
-                      background: "var(--accent)", boxShadow: "var(--glow)",
+                      background: "var(--success)",
                     }}
                   />
                 )}

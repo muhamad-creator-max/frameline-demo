@@ -12,120 +12,147 @@
 
 @layer base {
   :root {
-    /* ───── Frameline raw tokens ───── */
-    --bg:           #fefefe;
-    --bg-2:         #eff1f4;
-    --surface:      #ffffff;
-    --surface-2:    #f6f7f9;
+    /* ───── Frameline tokens (green accent, Rubik body) ─────
+       The authoritative product identity. One accent — green #00be43 —
+       across all general app UI; the multi-colour node palette is reserved
+       for the Workflows canvas. Values are the exact Frameline hex. */
+    --bg:           #fefefe;   /* page */
+    --bg-2:         #eff1f4;   /* rails / sidebar */
+    --surface:      #ffffff;   /* cards */
+    --surface-2:    #f6f7f9;   /* inset panels */
+    --canvas:       #fbfbfa;   /* the canvas field (left as-is) */
     --text:         #0a0a0b;
     --text-2:       #5b6573;
     --text-3:       #97a0ad;
     --border-raw:   #e4e7ec;
     --border-2:     #d6dae1;
+
+    /* Primary action = brand green (Frameline's primary button) */
     --accent:       #00be43;
-    --accent-ink:   #019a37;
-    --accent-weak:  #e6f8ec;
+    --accent-ink:   #019a37;   /* green foreground on tinted surfaces */
+    --accent-weak:  #e6f8ec;   /* success/accent tint bg */
     --accent-contrast: #ffffff;
+
+    /* Semantic status tones (Frameline status dots) */
+    --success:      #00be43;
+    --success-fg:   #019a37;
+    --success-weak: #e6f8ec;
+    --info:         #3b82f6;
+    --info-weak:    #e8f1fe;
+    --warning:      oklch(0.68 0.16 70);
     --danger:       #e5484d;
-    --shadow-sm:    0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.05);
-    --shadow-md:    0 4px 12px rgba(16,24,40,.08), 0 2px 4px rgba(16,24,40,.04);
-    --shadow-lg:    0 18px 48px rgba(16,24,40,.14), 0 4px 12px rgba(16,24,40,.06);
+
+    --shadow-sm:    0 1px 2px rgba(16,24,40,.06);
+    --shadow-md:    0 1px 2px rgba(16,24,40,.06);
+    --shadow-lg:    0 4px 16px rgba(16,24,40,.08), 0 20px 60px rgba(16,24,40,.10);
     --glow:         none;
-    --ring-frame:   0 0 0 4px rgba(0,190,67,.16);
+    --ring-frame:   0 0 0 3px rgba(0,190,67,.14);
 
     --r-sm: 8px;
-    --r-md: 12px;
-    --r-lg: 18px;
-    --r-xl: 26px;
+    --r-md: 10px;
+    --r-lg: 16px;
+    --r-xl: 20px;
 
     --maxw: 1180px;
     --sidebar-w: 252px;
-    --header-h: 60px;
+    --header-h: 56px;
 
-    /* ───── shadcn HSL vars routed to Frameline palette ───── */
-    --background: 0 0% 99.6%;
-    --foreground: 240 4% 5%;
+    /* ───── shadcn HSL vars routed to the Frameline palette ───── */
+    --background: 0 0% 99.6%;      /* #fefefe */
+    --foreground: 240 8% 5%;       /* #0a0a0b */
 
     --card: 0 0% 100%;
-    --card-foreground: 240 4% 5%;
+    --card-foreground: 240 8% 5%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 4% 5%;
+    --popover-foreground: 240 8% 5%;
 
-    --primary: 142 100% 37%;
+    --primary: 145 100% 37%;       /* #00be43 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 19% 95%;
-    --secondary-foreground: 240 4% 5%;
+    --secondary: 216 20% 95%;      /* #eff1f4 */
+    --secondary-foreground: 240 8% 5%;
 
-    --muted: 220 19% 95%;
-    --muted-foreground: 217 11% 40%;
+    --muted: 220 20% 97%;          /* #f6f7f9 */
+    --muted-foreground: 214 12% 40%; /* #5b6573 */
 
-    --accent-h: 142 100% 37%;
+    --accent-h: 145 100% 37%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 358 75% 59%;
+    --destructive: 358 76% 59%;    /* #e5484d */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 16% 91%;
-    --input: 220 13% 87%;
-    --ring: 142 100% 37%;
+    --border: 213 22% 91%;         /* #e4e7ec */
+    --input: 214 18% 86%;          /* #d6dae1 */
+    --ring: 145 100% 37%;          /* green focus ring */
 
-    --brand-glow: 142 100% 50%;
+    --brand-glow: 145 100% 37%;
 
-    --radius: 12px;
+    --radius: 10px;
   }
 
   [data-theme="dark"],
   .dark {
+    /* Frameline dark surfaces. Accent stays green — brightened to #2bff7c
+       for contrast on dark. Same token names, dark values. */
     --bg:           #08090b;
-    --bg-2:         #0e1014;
+    --bg-2:         #101318;
     --surface:      #14171c;
-    --surface-2:    #1a1e24;
+    --surface-2:    #1b1f26;
+    --canvas:       #0c0c0e;
     --text:         #f3f6f9;
     --text-2:       #9aa6b4;
-    --text-3:       #5f6a78;
-    --border-raw:   rgba(255,255,255,.08);
-    --border-2:     rgba(255,255,255,.14);
-    --accent:       #1aff6a;
+    --text-3:       #6b7684;
+    --border-raw:   rgba(255,255,255,0.08);
+    --border-2:     rgba(255,255,255,0.14);
+
+    --accent:       #2bff7c;
     --accent-ink:   #2bff7c;
-    --accent-weak:  rgba(26,255,106,.12);
-    --accent-contrast: #04130a;
-    --danger:       #ff6166;
+    --accent-weak:  rgba(43,255,124,0.12);
+    --accent-contrast: #08090b;
+
+    --success:      #2bff7c;
+    --success-fg:   #2bff7c;
+    --success-weak: rgba(43,255,124,0.12);
+    --info:         #60a5fa;
+    --info-weak:    rgba(96,165,250,0.14);
+    --warning:      oklch(0.78 0.15 70);
+    --danger:       #f87171;
+
     --shadow-sm:    0 1px 2px rgba(0,0,0,.5);
     --shadow-md:    0 6px 18px rgba(0,0,0,.5);
     --shadow-lg:    0 24px 60px rgba(0,0,0,.6);
-    --glow:         0 0 0 1px rgba(26,255,106,.25), 0 0 26px rgba(26,255,106,.30);
-    --ring-frame:   0 0 0 4px rgba(26,255,106,.22);
+    --glow:         none;
+    --ring-frame:   0 0 0 3px rgba(43,255,124,.18);
 
-    --background: 220 11% 4%;
-    --foreground: 210 25% 96%;
+    --background: 220 16% 4%;      /* #08090b */
+    --foreground: 210 27% 96%;     /* #f3f6f9 */
 
-    --card: 220 13% 9%;
-    --card-foreground: 210 25% 96%;
+    --card: 220 14% 9%;            /* #14171c */
+    --card-foreground: 210 27% 96%;
 
-    --popover: 220 13% 9%;
-    --popover-foreground: 210 25% 96%;
+    --popover: 220 14% 9%;
+    --popover-foreground: 210 27% 96%;
 
-    --primary: 138 100% 55%;
-    --primary-foreground: 138 60% 5%;
+    --primary: 146 100% 58%;       /* #2bff7c */
+    --primary-foreground: 220 16% 4%;
 
-    --secondary: 220 13% 12%;
-    --secondary-foreground: 210 25% 96%;
+    --secondary: 220 13% 14%;
+    --secondary-foreground: 210 27% 96%;
 
-    --muted: 220 13% 11%;
-    --muted-foreground: 213 13% 65%;
+    --muted: 220 13% 14%;
+    --muted-foreground: 214 15% 66%; /* #9aa6b4 */
 
-    --accent-foreground: 138 60% 5%;
+    --accent-foreground: 220 16% 4%;
 
-    --destructive: 358 100% 70%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84% 71%;
+    --destructive-foreground: 220 16% 4%;
 
-    --border: 220 7% 14%;
-    --input: 220 7% 14%;
-    --ring: 138 100% 55%;
+    --border: 220 13% 16%;
+    --input: 220 13% 16%;
+    --ring: 146 100% 58%;
 
-    --brand-glow: 138 100% 65%;
+    --brand-glow: 146 100% 58%;
   }
 }
 
@@ -142,7 +169,9 @@
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: var(--font-rubik), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    /* Rubik (Frameline body/UI face; includes an Arabic subset for RTL).
+       System faces remain as graceful fallbacks. */
+    font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     font-feature-settings: "rlig" 1, "calt" 1;
@@ -155,9 +184,10 @@
      backgrounds don't animate (also avoids stuck states if throttled) */
   .theme-switching * { transition: none !important; }
 
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 99px; border: 3px solid var(--bg); background-clip: padding-box; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text-3); background-clip: padding-box; }
+  /* Thin zinc scrollbar, matching the canvas design. */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
   ::-webkit-scrollbar-track { background: transparent; }
 
   /* RTL helpers — Arabic */
@@ -168,7 +198,7 @@
 }
 
 @layer components {
-  /* ── Frameline eyebrow label (uppercase, tracked, Rubik 500) ── */
+  /* ── Frameline eyebrow label (uppercase, tracked, sans 500) ── */
   .eyebrow {
     font-size: 10.5px;
     letter-spacing: 0.1em;
@@ -177,6 +207,129 @@
     font-weight: 500;
   }
   .mono { font-family: var(--font-jetbrains-mono), ui-monospace, monospace; }
+
+  /* ── Display title: JetBrains Mono, uppercase, tracked. For page + section
+     headings. Size is driven by --display-title-size so callers can scale it
+     without redefining the family/tracking (default suits a section header). ── */
+  .display-title {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-size: var(--display-title-size, 1rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.15;
+    /* mono numerals read cleaner at title sizes */
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     Canvas Workspace kit — the design system shared with the workflow
+     canvas. Use these instead of hand-rolling buttons/cards/inputs so
+     the whole product stays on one identity.
+     ══════════════════════════════════════════════════════════════════ */
+
+  /* Meta text rule: mono + uppercase + tracked, for labels/buttons/badges.
+     Never for client-facing question copy — that stays in the sans face. */
+  .cv-meta {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Outline button (design's "Live Preview") */
+  .cv-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border-raw);
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background .12s ease, border-color .12s ease;
+  }
+  .cv-btn:hover { background: var(--surface-2); }
+  .cv-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+  /* Primary button (design's solid near-black "Save") */
+  .cv-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var(--r-md);
+    border: 1px solid transparent;
+    background: var(--accent);
+    color: var(--accent-contrast);
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: filter .12s ease;
+  }
+  .cv-btn-primary:hover { filter: brightness(1.15); }
+  .cv-btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+
+  /* Card surface (design's node card) */
+  .cv-card {
+    background: var(--surface);
+    border: 1px solid var(--border-raw);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Inset panel (design's settings / hand-off panel) */
+  .cv-panel {
+    background: var(--surface-2);
+    border: 1px solid var(--border-raw);
+    border-radius: var(--r-md);
+  }
+
+  /* Text input / textarea */
+  .cv-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--border-raw);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    color: var(--text);
+    padding: 8px 10px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .12s ease, box-shadow .12s ease;
+  }
+  .cv-input:focus {
+    border-color: var(--border-2);
+    box-shadow: var(--ring-frame);
+  }
+
+  /* Dashed "add" affordance (design's "+ Add choice / + Add setting") */
+  .cv-dashed {
+    border: 1px dashed var(--border-2);
+    background: none;
+    border-radius: var(--r-sm);
+    padding: 5px 10px;
+    font-size: 11px;
+    color: var(--text-3);
+    cursor: pointer;
+  }
+  .cv-dashed:hover { color: var(--text-2); border-color: var(--text-3); }
+
+  /* Table/list row shell used across the app's index pages */
+  .cv-row {
+    border-bottom: 1px solid var(--border-raw);
+    transition: background .1s ease;
+  }
+  .cv-row:hover { background: var(--surface-2); }
   .muted { color: var(--text-2); }
   .faint { color: var(--text-3); }
 
@@ -202,7 +355,7 @@
     background: var(--surface);
     box-shadow:
       0 0 0 1px var(--border-2),
-      0 0 40px -8px rgba(26,255,106,.25),
+      0 0 40px -8px rgba(43,255,124,.22),
       0 18px 60px -20px rgba(0,0,0,.6);
   }
 
@@ -256,6 +409,33 @@
     background-image: none;
   }
 
+  /* ── Dotted canvas background for the Workflows editor (both themes) ── */
+  .workflow-dotted-bg {
+    background-color: var(--bg);
+    background-image: radial-gradient(rgba(16, 24, 40, 0.10) 1px, transparent 1px);
+    background-size: 22px 22px;
+    background-position: -11px -11px;
+  }
+  [data-theme="dark"] .workflow-dotted-bg,
+  .dark .workflow-dotted-bg {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  }
+
+  /* ── Dotted canvas field ──
+     Minimal texture: small, low-contrast dots. The canvas component owns
+     background-size / -position (it syncs them to the camera so the field is
+     effectively infinite), so the dot is sized as a FRACTION of the tile —
+     that way it scales with zoom instead of staying a fixed 1px.
+     Fallback size here is only for a static render. */
+  .workflow-dots {
+    background-image: radial-gradient(circle at center, rgba(16, 24, 40, 0.13) 7%, transparent 7.5%);
+    background-size: 18px 18px;
+  }
+  [data-theme="dark"] .workflow-dots,
+  .dark .workflow-dots {
+    background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.09) 7%, transparent 7.5%);
+  }
+
   /* ── Fade transitions matching the design package ── */
   .fade-enter { animation: fadeUp .5s cubic-bezier(.22,.61,.36,1) both; }
   .fade-only  { animation: fadeIn .5s ease both; }
@@ -277,4 +457,28 @@
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+
+/* The workflow canvas sets `user-select:none` so dragging ports/cards/marquee
+   never starts a native text selection. Form controls must opt back in, or you
+   can't select text while editing a node's fields. */
+.workflow-dots input,
+.workflow-dots textarea,
+.workflow-dots [contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Magnetism ring that appears when a dragged wire snaps to an input port. */
+.wf-snap-ring { animation: wfSnapRing 240ms ease-out; transform-box: fill-box; transform-origin: center; }
+@keyframes wfSnapRing {
+  0%   { opacity: 0; transform: scale(1.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Soft breathing glow for a live/in-progress status dot (StatusPill pulse). */
+.status-dot-pulse { animation: statusDotPulse 1.6s ease-in-out infinite; }
+@keyframes statusDotPulse {
+  0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 currentColor; }
+  50%      { opacity: .55; box-shadow: 0 0 0 3px transparent; }
 }

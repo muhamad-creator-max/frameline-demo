@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { User, Globe, CreditCard, Moon, Sun, Monitor, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { useI18n, type Locale } from "@/lib/i18n/provider";
+import { type Locale } from "@/lib/i18n/provider";
 import { CheckoutButton, ManageBillingButton } from "@/components/billing/billing-buttons";
 import { PLANS } from "@/lib/stripe/plans";
 
@@ -28,7 +28,7 @@ export function SettingsPageClient({
   return (
     <div style={{ height: "100%", overflowY: "auto" }}>
       <div style={{ maxWidth: 840, margin: "0 auto", padding: "28px 32px 80px" }}>
-        <h1 style={{ fontSize: 22, fontWeight: 600, marginBottom: 22 }}>Settings</h1>
+        <h1 className="display-title" style={{ ["--display-title-size" as string]: "22px", marginBottom: 22 }}>Settings</h1>
 
         <div style={{ display: "flex", gap: 4, marginBottom: 22, borderBottom: "1px solid var(--border-raw)" }}>
           <Tab active={tab === "profile"}    onClick={() => setTab("profile")}    icon={<User size={13} />}>Profile</Tab>
@@ -37,7 +37,7 @@ export function SettingsPageClient({
         </div>
 
         {tab === "profile"    && <ProfileTab initial={profile} />}
-        {tab === "appearance" && <AppearanceTab initialLocale={profile.locale} />}
+        {tab === "appearance" && <AppearanceTab />}
         {tab === "billing"    && <BillingTab plan={profile.plan} subscription={subscription} />}
       </div>
     </div>
@@ -96,13 +96,7 @@ function ProfileTab({ initial }: { initial: ProfileShape }) {
         <div>
           <button
             type="submit" disabled={saving}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 6,
-              padding: "8px 14px", borderRadius: "var(--r-md)",
-              background: "var(--accent)", color: "var(--accent-contrast)",
-              border: "1px solid transparent", boxShadow: "var(--glow)",
-              fontWeight: 500, fontSize: 13, cursor: saving ? "not-allowed" : "pointer",
-            }}
+            className="cv-btn-primary"
           >
             {saving && <Loader2 className="animate-spin" size={13} />}
             Save changes
@@ -113,63 +107,36 @@ function ProfileTab({ initial }: { initial: ProfileShape }) {
   );
 }
 
-function AppearanceTab({ initialLocale }: { initialLocale: Locale }) {
-  const { setLocale, locale } = useI18n();
+function AppearanceTab() {
   const { setTheme, theme } = useTheme();
-  React.useEffect(() => { if (initialLocale !== locale) setLocale(initialLocale); }, [initialLocale, locale, setLocale]);
 
   return (
-    <>
-      <Section title="Theme">
-        <div style={{ display: "flex", gap: 8 }}>
-          {(["light", "dark", "system"] as const).map((t) => {
-            const Icon = t === "light" ? Sun : t === "dark" ? Moon : Monitor;
-            const active = theme === t;
-            return (
-              <button
-                key={t}
-                onClick={() => setTheme(t)}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: 7,
-                  padding: "8px 14px", borderRadius: "var(--r-md)",
-                  background: active ? "var(--surface)" : "var(--bg-2)",
-                  color: active ? "var(--text)" : "var(--text-2)",
-                  border: "1px solid", borderColor: active ? "var(--accent)" : "var(--border-raw)",
-                  fontSize: 13, fontWeight: 500, cursor: "pointer",
-                  boxShadow: active ? "var(--shadow-sm)" : "none",
-                  textTransform: "capitalize",
-                }}
-              >
-                <Icon size={13} /> {t}
-              </button>
-            );
-          })}
-        </div>
-      </Section>
-      <Section title="Language">
-        <div style={{ display: "flex", gap: 8 }}>
-          {(["en", "ar"] as Locale[]).map((l) => {
-            const active = locale === l;
-            return (
-              <button
-                key={l}
-                onClick={() => setLocale(l)}
-                style={{
-                  padding: "8px 14px", borderRadius: "var(--r-md)",
-                  background: active ? "var(--surface)" : "var(--bg-2)",
-                  color: active ? "var(--text)" : "var(--text-2)",
-                  border: "1px solid", borderColor: active ? "var(--accent)" : "var(--border-raw)",
-                  fontSize: 13, fontWeight: 500, cursor: "pointer",
-                  boxShadow: active ? "var(--shadow-sm)" : "none",
-                }}
-              >
-                {l === "en" ? "English" : "العربية"}
-              </button>
-            );
-          })}
-        </div>
-      </Section>
-    </>
+    <Section title="Theme">
+      <div style={{ display: "flex", gap: 8 }}>
+        {(["light", "dark", "system"] as const).map((t) => {
+          const Icon = t === "light" ? Sun : t === "dark" ? Moon : Monitor;
+          const active = theme === t;
+          return (
+            <button
+              key={t}
+              onClick={() => setTheme(t)}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 7,
+                padding: "8px 14px", borderRadius: "var(--r-md)",
+                background: active ? "var(--surface)" : "var(--bg-2)",
+                color: active ? "var(--text)" : "var(--text-2)",
+                border: "1px solid", borderColor: active ? "var(--accent)" : "var(--border-raw)",
+                fontSize: 13, fontWeight: 500, cursor: "pointer",
+                boxShadow: active ? "var(--shadow-sm)" : "none",
+                textTransform: "capitalize",
+              }}
+            >
+              <Icon size={13} /> {t}
+            </button>
+          );
+        })}
+      </div>
+    </Section>
   );
 }
 
@@ -242,9 +209,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <div style={{ marginBottom: 28 }}>
       <h2
+        className="display-title"
         style={{
-          fontSize: 11, fontWeight: 600,
-          color: "var(--text-3)", textTransform: "uppercase", letterSpacing: ".08em",
+          ["--display-title-size" as string]: "11px",
+          color: "var(--text-3)", letterSpacing: ".08em",
           marginBottom: 10,
         }}
       >

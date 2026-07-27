@@ -17,7 +17,8 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-rubik)", "system-ui", "sans-serif"],
+        // Inter (Latin/Cyrillic/Greek) + Arabic-capable system fallback for RTL.
+        sans: ["var(--font-sans)", "Segoe UI", "Tahoma", "system-ui", "sans-serif"],
         mono: ["var(--font-jetbrains-mono)", "ui-monospace", "monospace"],
       },
       colors: {
@@ -100,7 +101,7 @@ const config: Config = {
       },
       boxShadow: {
         glow: "var(--glow)",
-        "glow-static": "0 0 0 1px rgba(26,255,106,.25), 0 0 26px rgba(26,255,106,.30)",
+        "glow-static": "0 0 0 1px rgba(43,255,124,.25), 0 0 26px rgba(43,255,124,.30)",
         "glow-sm": "0 0 24px -8px hsl(var(--brand-glow) / 0.45)",
         "frame-sm": "var(--shadow-sm)",
         "frame-md": "var(--shadow-md)",

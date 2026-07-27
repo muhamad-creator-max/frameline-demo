@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { absoluteUrl } from "@/lib/utils";
+import { StatusPill, publishStatusTone, publishStatusLabel } from "@/components/ui/status-pill";
 
 interface Row {
   id: string;
@@ -113,7 +114,7 @@ export function GuidelinesPageClient({
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, marginBottom: 28 }}>
           <div style={{ minWidth: 0 }}>
-            <h1 style={{ fontSize: 22, fontWeight: 600, marginBottom: 6 }}>Guidelines</h1>
+            <h1 className="display-title" style={{ ["--display-title-size" as string]: "22px", marginBottom: 6 }}>Guidelines</h1>
             {featured && (
               <p style={{ fontSize: 13, color: "var(--text-2)" }}>
                 <strong style={{ color: "var(--text)", fontWeight: 500 }}>{featured.title}</strong>
@@ -121,22 +122,7 @@ export function GuidelinesPageClient({
               </p>
             )}
           </div>
-          <button
-            onClick={createGuideline}
-            disabled={creating}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 7,
-              padding: "8px 14px",
-              borderRadius: "var(--r-md)",
-              background: "var(--accent)", color: "var(--accent-contrast)",
-              border: "1px solid transparent",
-              boxShadow: "var(--glow)",
-              fontWeight: 500, fontSize: 13,
-              cursor: creating ? "not-allowed" : "pointer",
-              opacity: creating ? 0.7 : 1,
-              flexShrink: 0,
-            }}
-          >
+          <button onClick={createGuideline} disabled={creating} className="cv-btn-primary" style={{ flexShrink: 0 }}>
             {creating ? <Loader2 className="animate-spin" size={14} /> : <Plus size={14} />}
             New Guideline
           </button>
@@ -146,23 +132,16 @@ export function GuidelinesPageClient({
           <Empty onCreate={createGuideline} />
         ) : (
           <>
-            <div
-              style={{
-                background: "var(--surface)",
-                border: "1px solid var(--border-raw)",
-                borderRadius: "var(--r-md)",
-                overflow: "hidden",
-              }}
-            >
+            <div className="cv-card" style={{ overflow: "hidden" }}>
               <div
+                className="cv-meta"
                 style={{
                   display: "grid",
                   gridTemplateColumns: "minmax(0, 1fr) 100px 90px 80px 130px 40px",
-                  padding: "9px 16px",
+                  padding: "10px 16px",
                   borderBottom: "1px solid var(--border-raw)",
-                  fontSize: 11, fontWeight: 600,
+                  fontSize: 9.5,
                   color: "var(--text-3)",
-                  textTransform: "uppercase", letterSpacing: ".06em",
                   background: "var(--surface-2)",
                 }}
               >
@@ -270,9 +249,11 @@ function GuidelineRow({
         )}
       </div>
 
-      <button onClick={onToggleStatus} style={statusPillStyle(row.status)}>
-        {row.status === "published" ? "Public" : row.status === "draft" ? "Private" : "Archived"}
-      </button>
+      <div style={{ justifySelf: "start" }}>
+        <StatusPill tone={publishStatusTone(row.status)} onClick={onToggleStatus}>
+          {publishStatusLabel(row.status)}
+        </StatusPill>
+      </div>
 
       <span className="mono" style={{ textAlign: "center", color: "var(--text-2)", fontSize: 12 }}>
         {row.question_count}
@@ -373,23 +354,6 @@ function MenuItem({
   );
 }
 
-function statusPillStyle(status: Row["status"]): React.CSSProperties {
-  const styles: Record<Row["status"], { bg: string; fg: string }> = {
-    published: { bg: "var(--accent-weak)", fg: "var(--accent-ink)" },
-    draft:     { bg: "var(--bg-2)",         fg: "var(--text-2)" },
-    archived:  { bg: "var(--bg-2)",         fg: "var(--text-3)" },
-  };
-  const s = styles[status];
-  return {
-    display: "inline-flex", alignItems: "center", gap: 5,
-    background: s.bg, color: s.fg,
-    fontSize: 11, fontWeight: 500,
-    padding: "3px 9px", borderRadius: 99,
-    border: "1px solid transparent",
-    cursor: "pointer", justifySelf: "start",
-    textTransform: "capitalize",
-  };
-}
 
 function PageBtn({
   children, onClick, disabled,
@@ -414,15 +378,7 @@ function PageBtn({
 
 function Empty({ onCreate }: { onCreate: () => void }) {
   return (
-    <div
-      style={{
-        background: "var(--surface)",
-        border: "1px solid var(--border-raw)",
-        borderRadius: "var(--r-md)",
-        padding: "60px 24px",
-        textAlign: "center",
-      }}
-    >
+    <div className="cv-card" style={{ padding: "60px 24px", textAlign: "center" }}>
       <div
         style={{
           display: "inline-flex", width: 44, height: 44, borderRadius: 12,
@@ -432,21 +388,11 @@ function Empty({ onCreate }: { onCreate: () => void }) {
       >
         <Plus size={22} />
       </div>
-      <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>No guidelines yet</h2>
-      <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 14 }}>
+      <h2 className="display-title" style={{ ["--display-title-size" as string]: "15px", marginBottom: 6 }}>No guidelines yet</h2>
+      <p style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 16 }}>
         Create your first visual brief — it takes about 2 minutes.
       </p>
-      <button
-        onClick={onCreate}
-        style={{
-          padding: "7px 14px", borderRadius: "var(--r-md)",
-          background: "var(--accent)", color: "var(--accent-contrast)",
-          border: "1px solid transparent", boxShadow: "var(--glow)",
-          fontWeight: 500, fontSize: 12.5, cursor: "pointer",
-        }}
-      >
-        New Guideline
-      </button>
+      <button onClick={onCreate} className="cv-btn-primary">New Guideline</button>
     </div>
   );
 }

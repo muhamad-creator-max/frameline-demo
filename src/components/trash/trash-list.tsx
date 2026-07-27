@@ -41,34 +41,17 @@ export function TrashList({ items: initial }: { items: Item[] }) {
   return (
     <div style={{ height: "100%", overflowY: "auto" }}>
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "28px 32px 80px" }}>
-        <h1 style={{ fontSize: 22, fontWeight: 600, marginBottom: 6 }}>Trash</h1>
+        <h1 className="display-title" style={{ ["--display-title-size" as string]: "22px", marginBottom: 6 }}>Trash</h1>
         <p style={{ fontSize: 12.5, color: "var(--text-2)", marginBottom: 22 }}>
           Items in trash are deleted permanently after 30 days.
         </p>
 
         {items.length === 0 ? (
-          <div
-            style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border-raw)",
-              borderRadius: "var(--r-md)",
-              padding: "44px 24px",
-              textAlign: "center",
-              color: "var(--text-3)",
-              fontSize: 13,
-            }}
-          >
+          <div className="cv-card" style={{ padding: "44px 24px", textAlign: "center", color: "var(--text-3)", fontSize: 13 }}>
             Trash is empty.
           </div>
         ) : (
-          <div
-            style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border-raw)",
-              borderRadius: "var(--r-md)",
-              overflow: "hidden",
-            }}
-          >
+          <div className="cv-card" style={{ overflow: "hidden" }}>
             {items.map((it, idx) => {
               const days = Math.max(
                 0,

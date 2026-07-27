@@ -64,30 +64,12 @@ export function ProjectsList({ projects }: { projects: ProjectCard[] }) {
     <div style={{ padding: "26px 32px", maxWidth: "var(--maxw)", margin: "0 auto", width: "100%" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>Review</h1>
+          <h1 className="display-title" style={{ ["--display-title-size" as string]: "22px", margin: 0 }}>Review</h1>
           <p style={{ fontSize: 13.5, color: "var(--text-2)", margin: "4px 0 0" }}>
             Upload media, share for review, and collect frame-accurate feedback.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={create}
-          disabled={creating}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 7,
-            padding: "9px 15px",
-            borderRadius: 9,
-            border: "none",
-            background: "var(--accent)",
-            color: "var(--accent-contrast)",
-            fontSize: 13.5,
-            fontWeight: 500,
-            cursor: creating ? "default" : "pointer",
-            boxShadow: "var(--glow)",
-          }}
-        >
+        <button type="button" onClick={create} disabled={creating} className="cv-btn-primary" style={{ flexShrink: 0 }}>
           {creating ? <Loader2 size={15} className="animate-spin" /> : <Plus size={16} />}
           New project
         </button>
@@ -136,16 +118,7 @@ export function ProjectsList({ projects }: { projects: ProjectCard[] }) {
           }}
         >
           {projects.map((p) => (
-            <div
-              key={p.id}
-              style={{
-                borderRadius: "var(--r-md)",
-                border: "1px solid var(--border-raw)",
-                background: "var(--surface)",
-                overflow: "hidden",
-                position: "relative",
-              }}
-            >
+            <div key={p.id} className="cv-card" style={{ overflow: "hidden", position: "relative" }}>
               <Link href={`/app/review/${p.id}`} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
                 <div
                   style={{

@@ -35,21 +35,12 @@ export function ResponsesFeed({ items: initial }: { items: Item[] }) {
   return (
     <div style={{ height: "100%", overflowY: "auto" }}>
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "28px 32px 80px" }}>
-        <h1 style={{ fontSize: 22, fontWeight: 600, marginBottom: 22 }}>Responses</h1>
+        <h1 className="display-title" style={{ ["--display-title-size" as string]: "22px", marginBottom: 22 }}>Responses</h1>
 
         {items.length === 0 ? (
-          <div
-            style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border-raw)",
-              borderRadius: "var(--r-md)",
-              padding: "60px 24px",
-              textAlign: "center",
-              color: "var(--text-2)",
-            }}
-          >
+          <div className="cv-card" style={{ padding: "60px 24px", textAlign: "center", color: "var(--text-2)" }}>
             <Inbox size={22} style={{ marginBottom: 10, color: "var(--text-3)" }} />
-            <h2 style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 4 }}>No responses yet</h2>
+            <h2 className="display-title" style={{ ["--display-title-size" as string]: "14px", color: "var(--text)", marginBottom: 6 }}>No responses yet</h2>
             <p style={{ fontSize: 13 }}>Share a brief link with your client to start collecting answers.</p>
           </div>
         ) : (
@@ -80,15 +71,7 @@ function FeedRow({
 }) {
   const initials = it.client_name.split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase();
   return (
-    <div
-      style={{
-        background: "var(--surface)",
-        border: "1px solid var(--border-raw)",
-        borderRadius: "var(--r-md)",
-        padding: "12px 14px",
-        display: "flex", alignItems: "center", gap: 12,
-      }}
-    >
+    <div className="cv-card" style={{ padding: "12px 14px", display: "flex", alignItems: "center", gap: 12 }}>
       <span
         style={{
           width: 34, height: 34, borderRadius: 99,
